@@ -6,6 +6,7 @@ import base64 , binascii , rsa
 import time
 import os
 import string
+import shutil
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -107,14 +108,14 @@ class PUB:
         i = self.opener.open(request)
         return self.cookies
 
-
-
-rootdir = "/Users/ganlinhao/pic"
-newdir = '/Users/ganlinhao/pic'
-olddir = '/Users/ganlinhao/pic'
+rootdir = "/Users/ganlinhao/picture8"
+newdir = '/Users/ganlinhao/picture8'
+olddir = '/Users/ganlinhao/picture8'
+newpath = '/Users/ganlinhao/newpicture8'
 username = 'xx'
 UIDlist = os.listdir(rootdir)
-print UIDlist
+if UIDlist[0]== '.DS_Store':
+    UIDlist.pop(0)
 htmllist = []
 header = "http://weibo.com/u"
 
@@ -138,6 +139,8 @@ for dirname in UIDlist:
         if hasattr(e, "reason"):
             print e.reason
 
+    if not nickname:
+        continue
     pub = PUB()
     pub.getpage()
 
@@ -150,20 +153,23 @@ for dirname in UIDlist:
             break
 
     if lenth > 40: #faulse
-        print ("this name is existed: "+nickname[0]+ dirname)
+        print ("this name is existed: "+nickname[0])
         fail_number = fail_number + 1
-    if lenth != 40:#succesed
+        shutil.rmtree(os.path.join(newdir, dirname))
+    if lenth < 40:#succesed
         try:
             os.rename(os.path.join(olddir,dirname), os.path.join(newdir, nickname[0]))
-            print (nickname[0]+ " has been processed")
+            shutil.copytree(os.path.join(newdir, nickname[0]), os.path.join(newpath, nickname[0]))
+            shutil.rmtree(os.path.join(newdir, nickname[0]))
             su_number = su_number + 1
+            print (nickname[0]+ " is done!")
         except ValueError:
             print("valueError when rename the file "+ dirname)
         except NameError:
             print("nameError when rename the file "+ dirname)
         except OSError:
             print("osError when rename the file "+ dirname)
-    time.sleep(0.5)
+    time.sleep(2)
 
 print("change file name end")
 print su_number
